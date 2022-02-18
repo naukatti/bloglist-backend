@@ -4,18 +4,20 @@
   "description": "backend for fullstack mooc exercise",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "build:ui": "rm -rf build && cd ../../../2/luento/notes && npm run build && cp -r build ../../../3/luento/notes-backend",
     "deploy": "git push heroku master",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
     "logs:prod": "heroku logs --tail",
     "lint": "eslint .",
-    "test": "jest --verbose --silent=false"
+    "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand --forceExit"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "jest": "^27.5.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.2"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -24,7 +26,7 @@
     "mongoose": "^6.1.2",
     "morgan": "^1.10.0"
   },
-   "jest": {
-   "testEnvironment": "node"
- }
+  "jest": {
+    "testEnvironment": "node"
+  }
 }
