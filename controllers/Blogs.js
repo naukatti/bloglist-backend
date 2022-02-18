@@ -25,9 +25,10 @@ blogsRouter.post("/", (request, response, next) => {
   const body = request.body;
 
   const blog = new Blog({
-    content: body.content,
-    important: body.important || false,
-    date: new Date(),
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: 0,
   });
 
   blog
@@ -49,14 +50,15 @@ blogsRouter.delete("/:id", (request, response, next) => {
 blogsRouter.put("/:id", (request, response, next) => {
   const body = request.body;
 
-  const note = {
-    content: body.content,
-    important: body.important,
+  const blog = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
   };
 
-  Blog.findByIdAndUpdate(request.params.id, note, { new: true })
-    .then((updatedNote) => {
-      response.json(updatedNote.toJSON());
+  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    .then((updatedBlog) => {
+      response.json(updatedBlog.toJSON());
     })
     .catch((error) => next(error));
 });
