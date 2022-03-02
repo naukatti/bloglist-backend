@@ -1,6 +1,7 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/Blog");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 blogsRouter.get("/", async (request, response, next) => {
   try {
@@ -30,7 +31,8 @@ blogsRouter.get("/:id", (request, response, next) => {
 
 blogsRouter.post("/", async (request, response, next) => {
   const body = request.body;
-  const user = await User.findById(body.userId);
+
+  const user = await User.findById(request.userId);
 
   const blog = new Blog({
     title: body.title,
@@ -39,26 +41,36 @@ blogsRouter.post("/", async (request, response, next) => {
     user: user._id,
     likes: body.likes || 0,
   });
+  try {
+    const savedBlog = await blog.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
 
-  blog
-    .save()
-    .then((savedBlog) => {
-      response.json(savedBlog.toJSON());
-    })
-    .catch((error) => next(error));
+    response.status(201).json(savedBlog);
+  } catch (error) {
+    next(error);
+  }
 });
 
-blogsRouter.delete("/:id", (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
+blogsRouter.delete("/:id", async (request, response, next) => {
+  try {
+    const blog = await Blog.findById(request.params.id);
+    if (blog === null) {
+      response.status(404).end();
+    } else if (request.userId.toString() === blog.user.toString()) {
+      await Blog.findByIdAndRemove(request.params.id);
       response.status(204).end();
-    })
-    .catch((error) => next(error));
+    } else {
+      response.status(403).end();
+    }
+  } catch (error) {
+    next();
+  }
 });
 
 blogsRouter.put("/:id", async (request, response, next) => {
   const body = request.body;
-  const user = await User.findById(body.userId);
+  const user = await User.findById(request.userId);
 
   const blog = {
     title: body.title,

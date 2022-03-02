@@ -11,7 +11,8 @@
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
     "logs:prod": "heroku logs --tail",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand --forceExit"
+    "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand --forceExit",
+    "test_with_logs": "cross-env NODE_ENV=test jest --verbose --runInBand --forceExit"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
